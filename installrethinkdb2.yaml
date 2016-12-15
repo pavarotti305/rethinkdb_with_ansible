@@ -1,0 +1,90 @@
+---
+- hosts: rethinkdb2
+  become: yes
+
+  tasks:
+    - name: Update all packages.
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages to the latest version
+      apt:
+        upgrade: dist
+
+    - name: Install rethinkdb.
+      apt: name=rethinkdb state=latest
+
+
+    - name: Copy configuration files.
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - src: "cluster_instance2.conf"
+          dest: "/etc/rethinkdb/instances.d/cluster_instance.conf"
+
+    - name: Iptables allow incoming connection of rethinkdb1 IP on port 29015.
+      iptables:
+         chain: INPUT
+         in_interface: eth1
+         source: 172.16.25.10
+         protocol: tcp
+         destination_port: 29015
+         jump: ACCEPT
+
+    - name: Iptables allow local incoming connection on port 29015.
+      iptables:
+         chain: INPUT
+         in_interface: eth1
+         source: 127.0.0.1
+         protocol: tcp
+         destination_port: 29015
+         jump: ACCEPT
+
+    - name: Iptables allow only local incoming connection on port 28015.
+      iptables:
+         chain: INPUT
+         in_interface: eth1
+         source: 127.0.0.1
+         protocol: tcp
+         destination_port: 28015
+         jump: ACCEPT
+
+    - name: Iptables allow only local incoming connection.
+      iptables:
+         chain: INPUT
+         in_interface: eth1
+         source: 127.0.0.1
+         protocol: tcp
+         destination_port: 8080
+         jump: ACCEPT
+
+    - name: Iptables Block all incoming connection on port 8080.
+      iptables:
+         chain: INPUT
+         in_interface: eth1
+         protocol: tcp
+         destination_port: 8080
+         jump: DROP
+
+    - name: Iptables Block all incoming connection on port 28015.
+      iptables:
+         chain: INPUT
+         in_interface: eth1
+         protocol: tcp
+         destination_port: 28015
+         jump: DROP
+
+    - name: Iptables Block all incoming connection on port 29015.
+      iptables:
+         chain: INPUT
+         in_interface: eth1
+         protocol: tcp
+         destination_port: 29015
+         jump: DROP
+
+    - name: save iptables
+      command: iptables-save
+
+    - name: Restarted Rethinkdb.
+      service: name=rethinkdb state=restarted

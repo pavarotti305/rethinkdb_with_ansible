@@ -1,0 +1,10 @@
+[masterdbserver]
+rethinkdb1
+
+[clusterdbservers]
+rethinkdb[2:3]
+
+# Group 'multi' with all servers
+[multi:children]
+masterdbserver
+clusterdbservers

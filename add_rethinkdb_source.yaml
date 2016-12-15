@@ -1,0 +1,15 @@
+---
+- hosts: all
+
+  tasks:
+    - name: Add rethinkdb repo into sources lists.
+      shell: source /etc/lsb-release && echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
+      args:
+          executable: /bin/bash
+
+    - name: Import rethinkdb pubkeey.
+      become: yes
+
+      apt_key:
+         url: "http://download.rethinkdb.com/apt/pubkey.gpg"
+         state: present

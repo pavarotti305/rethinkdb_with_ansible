@@ -1,0 +1,25 @@
+rethinkdb2
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+ACCEPT     tcp  --                       anywhere             tcp dpt:29015
+ACCEPT     tcp  --  localhost            anywhere             tcp dpt:29015
+ACCEPT     tcp  --  localhost            anywhere             tcp dpt:28015
+ACCEPT     tcp  --  localhost            anywhere             tcp dpt:http-alt
+DROP       tcp  --  anywhere             anywhere             tcp dpt:http-alt
+DROP       tcp  --  anywhere             anywhere             tcp dpt:28015
+DROP       tcp  --  anywhere             anywhere             tcp dpt:29015
+
+
+
+
+rethinkdb1
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+ACCEPT     tcp  --                       anywhere             tcp dpt:29015
+ACCEPT     tcp  --  localhost            anywhere             tcp dpt:29015
+ACCEPT     tcp  --  localhost            anywhere             tcp dpt:28015
+ACCEPT     tcp  --  localhost            anywhere             tcp dpt:http-alt
+DROP       tcp  --  anywhere             anywhere             tcp dpt:http-alt
+DROP       tcp  --  anywhere             anywhere             tcp dpt:28015
+DROP       tcp  --  anywhere             anywhere             tcp dpt:29015
+
