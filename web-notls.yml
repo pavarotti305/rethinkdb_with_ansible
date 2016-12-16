@@ -1,0 +1,31 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: install nginx.
+      apt: name=nginx update_cache=yes
+
+    - name: copy nginx config file.
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - src: "files/nginx.conf"
+          dest: "/etc/nginx/sites-available/default"
+
+    - name: Create symlink to default
+      file: src=/etc/nginx/sites-available/default dest=/etc/nginx/sites-enabled/default state=link
+      notify: nginx reload
+
+    - name: copy nginx index.html.
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: 0644
+      with_items:
+        - src: "templates/index.html.j2"
+          dest: "/usr/share/nginx/html/index.html"
+
+    - name: restart nginx
+      service: name=nginx state=restarted
