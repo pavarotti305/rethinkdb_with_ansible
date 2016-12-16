@@ -17,19 +17,28 @@
 
     - name: copy TLS key
       copy: src=files/nginx.key dest={{ key_file }} owner=root mode=0600
-      notify: restart nginx
+
+    - name: restart nginx
+      service: name=nginx state=restarted
 
     - name: copy TLS certificate
       copy: src=files/nginx.crt dest={{ cert_file }}
-      notify: restart nginx
+
+    - name: restart nginx
+      service: name=nginx state=restarted
 
     - name: copy nginx config file
       template: src=templates/nginx.conf.j2 dest={{ conf_file }}
-      notify: restart nginx
+
+    - name: restart nginx
+      service: name=nginx state=restarted
 
     - name: Create symlink to default
       file: src={{ conf_file }} dest=/etc/nginx/sites-enabled/default state=link
-      notify: nginx reload
+
+    - name: restart nginx
+      service: name=nginx state=restarted
+
 
     - name: copy nginx index.html.
       copy:
@@ -40,6 +49,5 @@
         - src: "templates/index.html.j2"
           dest: "/usr/share/nginx/html/index.html"
 
-   handlers:
     - name: restart nginx
       service: name=nginx state=restarted
